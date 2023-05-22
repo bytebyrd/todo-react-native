@@ -1,68 +1,112 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View
+} from 'react-native';
+import globalStyles from '../globalStyles';
 
-const TodoInput = ({ onAddTodo }) => {
+const TodoInput = ({ visible, onClose, onAddTodo }) => {
     const [enteredTodo, setEnteredTodo] = useState("");
+    const [error, setError] = useState("");
     return (
-        <View style={styles.inputContainer}>
-            <TextInput
-                style={styles.textInput}
-                value={enteredTodo}
-                onChangeText={setEnteredTodo}
-                placeholder='Add a todo' />
-            <Pressable
-                style={({ pressed }) => {
-                    return [
-                        styles.button,
-                        {
-                            backgroundColor: pressed ? '#736C00' : '#C6BB00'
-                        }
+        <Modal
+            style={styles.overlay}
+            visible={visible}
+            animationType='slide'>
 
-                    ]
-                }}
-                onPress={ () => {
-                    onAddTodo(enteredTodo);
-                    setEnteredTodo('');
-                } }
-            >
-                <Text style={styles.buttonText}>Add Todo</Text>
-            </Pressable>
-        </View>
+            <View style={styles.inputContainer}>
+                <Image source={require("../assets/goal.png")} style={styles.image} />
+                <TextInput
+                    style={styles.textInput}
+                    value={enteredTodo}
+                    onChangeText={setEnteredTodo}
+                    placeholder='Add a todo' />
+                <View style={styles.actionArea}>
+                    <Pressable style={({ pressed }) => {
+                        return [globalStyles.buttonDanger,
+                        {
+                            backgroundColor: pressed ? '#C50080' : '#f312a2'
+                        }]
+                    }}
+                        onPress={() => {
+                            setError("");
+                            onClose();
+                            }}>
+                        <Text style={globalStyles.buttonText}>Cancel</Text>
+                    </Pressable>
+                    <Pressable
+                        style={({ pressed }) => {
+                            return [globalStyles.buttonPrimary,
+                            {
+                                backgroundColor: pressed ? '#350576' : "#5e0acc"
+                            }]
+                        }}
+                        onPress={() => {
+                            if (!enteredTodo) {
+                                setError("Please enter a todo!")
+                            } else {
+                                onAddTodo(enteredTodo);
+                                setError("");
+                                setEnteredTodo('');
+                            }
+
+                        }}>
+                        <Text style={globalStyles.buttonText}>Add Todo</Text>
+
+                    </Pressable>
+                </View>
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+            </View>
+
+        </Modal>
+
     );
 }
 
 const styles = StyleSheet.create({
     inputContainer: {
-        flexDirection: 'row',
-        justifyContent: "space-between",
+        flex: 6,
+        backgroundColor: '#232225',
+        flexDirection: 'column',
+        justifyContent: "center",
         alignItems: "center",
-        marginBottom: 24,
-        borderBottomWidth: 1,
-        flex: 1,
-        borderBottomColor: '#cccccc'
+        padding: 16,
+    },
+    actionArea: {
+        marginTop: 8,
+        flexDirection: "row",
+        alignItems: "flex-start"
     },
     textInput: {
         borderWidth: 1,
-        borderColor: "#cccccc",
-        backgroundColor: "white",
-        borderRadius: 20,
-        marginRight: 8,
-        padding: 12,
-        width: "70%"
+        borderColor: "#e4d0ff",
+        backgroundColor: "#e4d0ff",
+        color: "#120438",
+        borderRadius: 6,
+        padding: 16,
+        width: "100%"
     },
-    button: {
-        backgroundColor: "C6BB00",
-        borderRadius: 20,
-        flexGrow: 1,
-        
-
+    image: {
+        width: 100,
+        height: 100,
+        margin: 20
     },
-    buttonText: {
-        color: "white",
-        textAlign: "center",
-        padding: 12,
-        fontWeight: "bold",
-
+    overlay: {
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "green",
+        height: 300
+    },
+    error: {
+        color: "red"
     }
 });
 export default TodoInput;

@@ -1,58 +1,60 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { 
+  Text, 
+  View, 
+  FlatList, 
+  Pressable } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import TodoItem from './components/TodoItem';
 import TodoInput from './components/TodoInput';
+import globalStyles from './globalStyles';
 export default function App() {
   const [todos, setTodos] = useState([]);
-  const [error, setError] = useState("");
+  const [modalVisible, setModalVisible] = useState(false)
+
 
   function addTodo(todo) {
-    if (!todo) {
-      setError("Please enter a todo!")
-    } else {
       setTodos((prevState) => [...prevState, { text: todo, id: Math.random().toString() }]);
-      setError("");
+      toggleModal()
     }
-  }
+  
 
+  function toggleModal() {
+    setModalVisible((prevState) => !prevState)
+  }
   function deleteTodo(id) {
     const filtered = todos.filter(todo => todo.id !== id);
     setTodos(filtered);
   }
   return (
-    <View style={styles.appContainer}>
-      <TodoInput onAddTodo={addTodo} />
+    <>  
+      <StatusBar style='light' />
+      <View style={globalStyles.appContainer}>
+        <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+          <Pressable style={({ pressed }) => {
+            return [
+              globalStyles.buttonPrimary,
+              {
+                width: 200,
+                backgroundColor: pressed ? '#350576' : "#5e0acc"
+              }
+            ]
+          }}
+            onPress={toggleModal}>
+            <Text style={globalStyles.buttonText}>Create New Todo</Text>
+          </Pressable>
+          <TodoInput visible={modalVisible} onClose={toggleModal} onAddTodo={addTodo} />
+        </View>
 
-      <View style={styles.listContainer}>
-        <FlatList
-          data={todos}
-          renderItem={({ item }) => { return <TodoItem ident={item.id} todo={item.text} onDeleteTodo={deleteTodo} />; }}
-          keyExtractor={(item) => item.id}
-        />
+
+        <View style={globalStyles.listContainer}>
+          <FlatList
+            data={todos}
+            renderItem={({ item }) => { return <TodoItem ident={item.id} todo={item.text} onDeleteTodo={deleteTodo} />; }}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
       </View>
-      <View style={styles.errorContainer}>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-      </View>
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  appContainer: {
-    paddingTop: 50,
-    paddingHorizontal: 16,
-    flex: 1,
-    backgroundColor: '#232225'
-
-  },
-  listContainer: {
-    flex: 5,
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: "center"
-  },
-  error: {
-    color: "red"
-  }
-});
