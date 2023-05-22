@@ -1,4 +1,4 @@
-## Todos with React native
+## <img src="./assets/goal.png" width="100" /> Todos with React native 
 
 This project was created as an excercise to learn the basics of React Native. Feel free to clone and expand on it.
 
